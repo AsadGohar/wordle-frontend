@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useRef, useEffect, useState } from "react";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
+import Wordle from "./components/wordle";
 
 function App() {
+  const [startGame, setStartGame] = useState(false);
+
+  const handleStartGame =(e) => {
+    e.preventDefault()
+    setStartGame(true)
+  }
+   
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App d-flex justify-content-center align-items-center">
+      {
+        startGame ?
+        <Wordle /> :
+        <button type="button" onClick={handleStartGame} className="w-25 btn btn-primary">Start Game</button>
+      }
+      <ToastContainer />
     </div>
   );
 }
