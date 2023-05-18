@@ -51,7 +51,7 @@ const Wordle = () => {
         ...prevState,
         [currentRow]: [
           ...prevState[currentRow],
-          { value: e.target.value, checked: "n", correct: "f" },
+          { value: e.target.value, checked: false, correct: false },
         ],
       }));
     }
@@ -147,10 +147,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["1"][0]?.checked == null ||
-                    inputLetters["1"][0]?.checked == "n"
+                    !inputLetters["1"][0]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["1"][0]?.checked === "y" &&
-                        inputLetters["1"][0]?.correct == "f"
+                      : inputLetters["1"][0]?.checked &&
+                        !inputLetters["1"][0]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -160,10 +160,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["1"][1]?.checked == null ||
-                    inputLetters["1"][1]?.checked == "n"
+                    !inputLetters["1"][1]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["1"][1]?.checked === "y" &&
-                        inputLetters["1"][1]?.correct == "f"
+                      : inputLetters["1"][1]?.checked &&
+                        !inputLetters["1"][1]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -173,10 +173,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["1"][2]?.checked == null ||
-                    inputLetters["1"][2]?.checked == "n"
+                    !inputLetters["1"][2]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["1"][2]?.checked === "y" &&
-                        inputLetters["1"][2]?.correct == "f"
+                      : inputLetters["1"][2]?.checked &&
+                        !inputLetters["1"][2]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -186,10 +186,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["1"][3]?.checked == null ||
-                    inputLetters["1"][3]?.checked == "n"
+                    !inputLetters["1"][3]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["1"][3]?.checked === "y" &&
-                        inputLetters["1"][3]?.correct == "f"
+                      : inputLetters["1"][3]?.checked &&
+                        !inputLetters["1"][3]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -199,10 +199,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["1"][4]?.checked == null ||
-                    inputLetters["1"][4]?.checked == "n"
+                    !inputLetters["1"][4]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["1"][4]?.checked === "y" &&
-                        inputLetters["1"][4]?.correct == "f"
+                      : inputLetters["1"][4]?.checked &&
+                        !inputLetters["1"][4]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -214,10 +214,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["2"][0]?.checked == null ||
-                    inputLetters["2"][0]?.checked == "n"
+                    !inputLetters["2"][0]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["2"][0]?.checked === "y" &&
-                        inputLetters["2"][0]?.correct == "f"
+                      : inputLetters["2"][0]?.checked &&
+                        !inputLetters["2"][0]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -227,10 +227,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["2"][1]?.checked == null ||
-                    inputLetters["2"][1]?.checked == "n"
+                    !inputLetters["2"][1]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["2"][1]?.checked === "y" &&
-                        inputLetters["2"][1]?.correct == "f"
+                      : inputLetters["2"][1]?.checked &&
+                        !inputLetters["2"][1]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -240,10 +240,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["2"][2]?.checked == null ||
-                    inputLetters["2"][2]?.checked == "n"
+                    !inputLetters["2"][2]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["2"][2]?.checked === "y" &&
-                        inputLetters["2"][2]?.correct == "f"
+                      : inputLetters["2"][2]?.checked &&
+                        !inputLetters["2"][2]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -253,10 +253,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["2"][3]?.checked == null ||
-                    inputLetters["2"][3]?.checked == "n"
+                    !inputLetters["2"][3]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["2"][3]?.checked === "y" &&
-                        inputLetters["2"][3]?.correct == "f"
+                      : inputLetters["2"][3]?.checked &&
+                        !inputLetters["2"][3]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -266,10 +266,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["2"][4]?.checked == null ||
-                    inputLetters["2"][4]?.checked == "n"
+                    !inputLetters["2"][4]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["2"][4]?.checked === "y" &&
-                        inputLetters["2"][4]?.correct == "f"
+                      : inputLetters["2"][4]?.checked &&
+                        !inputLetters["2"][4]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -281,10 +281,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["3"][0]?.checked == null ||
-                    inputLetters["3"][0]?.checked == "n"
+                    !inputLetters["3"][0]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["3"][0]?.checked === "y" &&
-                        inputLetters["3"][0]?.correct == "f"
+                      : inputLetters["3"][0]?.checked &&
+                        !inputLetters["3"][0]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -294,10 +294,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["3"][1]?.checked == null ||
-                    inputLetters["3"][1]?.checked == "n"
+                    !inputLetters["3"][1]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["3"][1]?.checked === "y" &&
-                        inputLetters["3"][1]?.correct == "f"
+                      : inputLetters["3"][1]?.checked &&
+                        !inputLetters["3"][1]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -307,10 +307,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["3"][2]?.checked == null ||
-                    inputLetters["3"][2]?.checked == "n"
+                    !inputLetters["3"][2]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["3"][2]?.checked === "y" &&
-                        inputLetters["3"][2]?.correct == "f"
+                      : inputLetters["3"][2]?.checked &&
+                        !inputLetters["3"][2]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -320,10 +320,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["3"][3]?.checked == null ||
-                    inputLetters["3"][3]?.checked == "n"
+                    !inputLetters["3"][3]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["3"][3]?.checked === "y" &&
-                        inputLetters["3"][3]?.correct == "f"
+                      : inputLetters["3"][3]?.checked &&
+                        !inputLetters["3"][3]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -333,10 +333,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["3"][4]?.checked == null ||
-                    inputLetters["3"][4]?.checked == "n"
+                    !inputLetters["3"][4]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["3"][4]?.checked === "y" &&
-                        inputLetters["3"][4]?.correct == "f"
+                      : inputLetters["3"][4]?.checked &&
+                        !inputLetters["3"][4]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -348,10 +348,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["4"][0]?.checked == null ||
-                    inputLetters["4"][0]?.checked == "n"
+                    !inputLetters["4"][0]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["4"][0]?.checked === "y" &&
-                        inputLetters["4"][0]?.correct == "f"
+                      : inputLetters["4"][0]?.checked &&
+                        !inputLetters["4"][0]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -361,10 +361,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["4"][1]?.checked == null ||
-                    inputLetters["4"][1]?.checked == "n"
+                    !inputLetters["4"][1]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["4"][1]?.checked === "y" &&
-                        inputLetters["4"][1]?.correct == "f"
+                      : inputLetters["4"][1]?.checked &&
+                        !inputLetters["4"][1]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -374,10 +374,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["4"][2]?.checked == null ||
-                    inputLetters["4"][2]?.checked == "n"
+                    !inputLetters["4"][2]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["4"][2]?.checked === "y" &&
-                        inputLetters["4"][2]?.correct == "f"
+                      : inputLetters["4"][2]?.checked &&
+                        !inputLetters["4"][2]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -387,10 +387,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["4"][3]?.checked == null ||
-                    inputLetters["4"][3]?.checked == "n"
+                    !inputLetters["4"][3]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["4"][3]?.checked === "y" &&
-                        inputLetters["4"][3]?.correct == "f"
+                      : inputLetters["4"][3]?.checked &&
+                        !inputLetters["4"][3]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -400,10 +400,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["4"][4]?.checked == null ||
-                    inputLetters["4"][4]?.checked == "n"
+                    !inputLetters["4"][4]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["4"][4]?.checked === "y" &&
-                        inputLetters["4"][4]?.correct == "f"
+                      : inputLetters["4"][4]?.checked &&
+                        !inputLetters["4"][4]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -415,10 +415,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["5"][0]?.checked == null ||
-                    inputLetters["5"][0]?.checked == "n"
+                    !inputLetters["5"][0]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["5"][0]?.checked === "y" &&
-                        inputLetters["5"][0]?.correct == "f"
+                      : inputLetters["5"][0]?.checked &&
+                        !inputLetters["5"][0]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -428,10 +428,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["5"][1]?.checked == null ||
-                    inputLetters["5"][1]?.checked == "n"
+                    !inputLetters["5"][1]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["5"][1]?.checked === "y" &&
-                        inputLetters["5"][1]?.correct == "f"
+                      : inputLetters["5"][1]?.checked &&
+                        !inputLetters["5"][1]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -441,10 +441,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["5"][2]?.checked == null ||
-                    inputLetters["5"][2]?.checked == "n"
+                    !inputLetters["5"][2]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["5"][2]?.checked === "y" &&
-                        inputLetters["5"][2]?.correct == "f"
+                      : inputLetters["5"][2]?.checked &&
+                        !inputLetters["5"][2]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -454,10 +454,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["5"][3]?.checked == null ||
-                    inputLetters["5"][3]?.checked == "n"
+                    !inputLetters["5"][3]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["5"][3]?.checked === "y" &&
-                        inputLetters["5"][3]?.correct == "f"
+                      : inputLetters["5"][3]?.checked &&
+                        !inputLetters["5"][3]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -467,10 +467,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["5"][4]?.checked == null ||
-                    inputLetters["5"][4]?.checked == "n"
+                    !inputLetters["5"][4]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["5"][4]?.checked === "y" &&
-                        inputLetters["5"][4]?.correct == "f"
+                      : inputLetters["5"][4]?.checked &&
+                        !inputLetters["5"][4]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -482,10 +482,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["6"][0]?.checked == null ||
-                    inputLetters["6"][0]?.checked == "n"
+                    !inputLetters["6"][0]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["6"][0]?.checked === "y" &&
-                        inputLetters["6"][0]?.correct == "f"
+                      : inputLetters["6"][0]?.checked &&
+                        !inputLetters["6"][0]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -495,10 +495,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["6"][1]?.checked == null ||
-                    inputLetters["6"][1]?.checked == "n"
+                    !inputLetters["6"][1]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["6"][1]?.checked === "y" &&
-                        inputLetters["6"][1]?.correct == "f"
+                      : inputLetters["6"][1]?.checked &&
+                        !inputLetters["6"][1]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -508,10 +508,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["6"][2]?.checked == null ||
-                    inputLetters["6"][2]?.checked == "n"
+                    !inputLetters["6"][2]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["6"][2]?.checked === "y" &&
-                        inputLetters["6"][2]?.correct == "f"
+                      : inputLetters["6"][2]?.checked &&
+                        !inputLetters["6"][2]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -521,10 +521,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["6"][3]?.checked == null ||
-                    inputLetters["6"][3]?.checked == "n"
+                    !inputLetters["6"][3]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["6"][3]?.checked === "y" &&
-                        inputLetters["6"][3]?.correct == "f"
+                      : inputLetters["6"][3]?.checked &&
+                        !inputLetters["6"][3]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -534,10 +534,10 @@ const Wordle = () => {
                 <div
                   className={
                     inputLetters["6"][4]?.checked == null ||
-                    inputLetters["6"][4]?.checked == "n"
+                    !inputLetters["6"][4]?.checked
                       ? "cube line1 col-2"
-                      : inputLetters["6"][4]?.checked === "y" &&
-                        inputLetters["6"][4]?.correct == "f"
+                      : inputLetters["6"][4]?.checked &&
+                        !inputLetters["6"][4]?.correct 
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
