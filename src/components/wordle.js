@@ -6,14 +6,19 @@ import axios from "axios";
 
 const Wordle = () => {
   const [currentRow, setCurrentRow] = useState(1);
+  const [currentLetter, setCurrentLetter] = useState('');
+  const [currentIndex, setCurrentIndex] = useState('');
   const [loader, setLoader] = useState(false);
 
   const verifyWord = async (user_word, wordleId) => {
     setLoader(true);
     try {
+      let word = getWord();
+      console.log(word, "word");
       let res = await axios.post("http://localhost:4000/api/wordle/attempt", {
         user_word,
         wordleId,
+        word,
       });
       if (res) {
         setLoader(false);
@@ -21,16 +26,31 @@ const Wordle = () => {
         if (res.data.user_won) {
           toast.success("user won");
         }
-        setInputLetter((prevState) => ({
-          ...prevState,
-          [currentRow]: [...res?.data?.responseArr],
-        }));
-        setCurrentRow((prevState) => prevState + 1);
+        if (!res.data.status && res.data.message !== "Word Not In The List") {
+          console.log('here',res?.data?.responseArr)
+          setInputLetter((prevState) => ({
+            ...prevState,
+            [currentRow]: [...res?.data?.responseArr],
+          }));
+          setCurrentRow((prevState) => prevState + 1);
+        } else {
+          toast.error (res.data.message);
+        }
       }
+      setLoader(false);
     } catch (error) {
       setLoader(false);
       console.log(error);
     }
+  };
+
+  const getWord = () => {
+    let word = "";
+    for (let index = 0; index < 5; index++) {
+      console.log();
+      word += inputLetters[currentRow][index].value;
+    }
+    return word;
   };
 
   const [inputLetters, setInputLetter] = useState({
@@ -54,68 +74,9 @@ const Wordle = () => {
           { value: e.target.value, checked: false, correct: false },
         ],
       }));
+      setCurrentLetter(e.target.value)
+      setCurrentIndex(inputLetters[currentRow].length)
     }
-  };
-
-  const checkWord = () => {
-    let wordArr = "SWIPE".split("");
-    let correct = false;
-    let resArr = [];
-    for (
-      let index = 0;
-      index < inputLetters[String(currentRow)].length;
-      index++
-    ) {
-      const element = inputLetters[String(currentRow)][index].value;
-      console.log(element !== wordArr[index], element, wordArr[index]);
-      if (element !== wordArr[index]) {
-        resArr.push(
-          createResultObj(
-            inputLetters[String(currentRow)][index].value,
-            "y",
-            "f"
-          )
-        );
-        correct = false;
-      } else if (index == 5 && element == wordArr[index] && correct) {
-        resArr.push(
-          createResultObj(
-            inputLetters[String(currentRow)][index].value,
-            "y",
-            "t"
-          )
-        );
-        setInputLetter((prevState) => ({
-          ...prevState,
-          [currentRow]: [...resArr],
-        }));
-        toast.success("word is correct");
-        return;
-      } else {
-        resArr.push(
-          createResultObj(
-            inputLetters[String(currentRow)][index].value,
-            "y",
-            "t"
-          )
-        );
-        correct = true;
-      }
-    }
-    console.log(resArr, "RESULT");
-    setInputLetter((prevState) => ({
-      ...prevState,
-      [currentRow]: [...resArr],
-    }));
-    setCurrentRow((prevState) => prevState + 1);
-  };
-
-  const createResultObj = (value, checked, correct) => {
-    return {
-      value,
-      checked,
-      correct,
-    };
   };
 
   const onClickEnter = async (e) => {
@@ -123,9 +84,33 @@ const Wordle = () => {
     if (currentRow > 6) {
       toast.error("Failed");
     } else if (checkIfComplete(inputLetters[String(currentRow)])) {
-      verifyWord(inputLetters[String(currentRow)], Number(localStorage.getItem('wordle_id')));
+      verifyWord(
+        inputLetters[String(currentRow)],
+        Number(localStorage.getItem("wordle_id"))
+      );
     } else {
       toast.error("Please Complete the Word");
+    }
+  };
+
+  const onClickBackspace = async (e) => {
+    e.preventDefault();
+    // console.log(inputLetters[String(currentIndex)])
+
+    const temp = [...inputLetters[String(currentRow)]];
+
+    // removing the element using splice
+    temp.splice(currentIndex, 1);
+    console.log(temp,'dsad',inputLetters[String(currentRow)])
+
+    setInputLetter((prevState) => ({
+      ...prevState,
+      [currentRow]: [
+        ...temp
+      ],
+    }));
+    if(!currentIndex==0){
+      setCurrentIndex((prevState)=>prevState-1)
     }
   };
 
@@ -176,7 +161,7 @@ const Wordle = () => {
                     !inputLetters["1"][2]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["1"][2]?.checked &&
-                        !inputLetters["1"][2]?.correct 
+                        !inputLetters["1"][2]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -189,7 +174,7 @@ const Wordle = () => {
                     !inputLetters["1"][3]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["1"][3]?.checked &&
-                        !inputLetters["1"][3]?.correct 
+                        !inputLetters["1"][3]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -202,7 +187,7 @@ const Wordle = () => {
                     !inputLetters["1"][4]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["1"][4]?.checked &&
-                        !inputLetters["1"][4]?.correct 
+                        !inputLetters["1"][4]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -217,7 +202,7 @@ const Wordle = () => {
                     !inputLetters["2"][0]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["2"][0]?.checked &&
-                        !inputLetters["2"][0]?.correct 
+                        !inputLetters["2"][0]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -230,7 +215,7 @@ const Wordle = () => {
                     !inputLetters["2"][1]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["2"][1]?.checked &&
-                        !inputLetters["2"][1]?.correct 
+                        !inputLetters["2"][1]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -243,7 +228,7 @@ const Wordle = () => {
                     !inputLetters["2"][2]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["2"][2]?.checked &&
-                        !inputLetters["2"][2]?.correct 
+                        !inputLetters["2"][2]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -256,7 +241,7 @@ const Wordle = () => {
                     !inputLetters["2"][3]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["2"][3]?.checked &&
-                        !inputLetters["2"][3]?.correct 
+                        !inputLetters["2"][3]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -269,7 +254,7 @@ const Wordle = () => {
                     !inputLetters["2"][4]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["2"][4]?.checked &&
-                        !inputLetters["2"][4]?.correct 
+                        !inputLetters["2"][4]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -284,7 +269,7 @@ const Wordle = () => {
                     !inputLetters["3"][0]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["3"][0]?.checked &&
-                        !inputLetters["3"][0]?.correct 
+                        !inputLetters["3"][0]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -297,7 +282,7 @@ const Wordle = () => {
                     !inputLetters["3"][1]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["3"][1]?.checked &&
-                        !inputLetters["3"][1]?.correct 
+                        !inputLetters["3"][1]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -310,7 +295,7 @@ const Wordle = () => {
                     !inputLetters["3"][2]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["3"][2]?.checked &&
-                        !inputLetters["3"][2]?.correct 
+                        !inputLetters["3"][2]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -323,7 +308,7 @@ const Wordle = () => {
                     !inputLetters["3"][3]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["3"][3]?.checked &&
-                        !inputLetters["3"][3]?.correct 
+                        !inputLetters["3"][3]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -336,7 +321,7 @@ const Wordle = () => {
                     !inputLetters["3"][4]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["3"][4]?.checked &&
-                        !inputLetters["3"][4]?.correct 
+                        !inputLetters["3"][4]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -351,7 +336,7 @@ const Wordle = () => {
                     !inputLetters["4"][0]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["4"][0]?.checked &&
-                        !inputLetters["4"][0]?.correct 
+                        !inputLetters["4"][0]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -364,7 +349,7 @@ const Wordle = () => {
                     !inputLetters["4"][1]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["4"][1]?.checked &&
-                        !inputLetters["4"][1]?.correct 
+                        !inputLetters["4"][1]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -377,7 +362,7 @@ const Wordle = () => {
                     !inputLetters["4"][2]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["4"][2]?.checked &&
-                        !inputLetters["4"][2]?.correct 
+                        !inputLetters["4"][2]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -390,7 +375,7 @@ const Wordle = () => {
                     !inputLetters["4"][3]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["4"][3]?.checked &&
-                        !inputLetters["4"][3]?.correct 
+                        !inputLetters["4"][3]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -403,7 +388,7 @@ const Wordle = () => {
                     !inputLetters["4"][4]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["4"][4]?.checked &&
-                        !inputLetters["4"][4]?.correct 
+                        !inputLetters["4"][4]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -418,7 +403,7 @@ const Wordle = () => {
                     !inputLetters["5"][0]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["5"][0]?.checked &&
-                        !inputLetters["5"][0]?.correct 
+                        !inputLetters["5"][0]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -431,7 +416,7 @@ const Wordle = () => {
                     !inputLetters["5"][1]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["5"][1]?.checked &&
-                        !inputLetters["5"][1]?.correct 
+                        !inputLetters["5"][1]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -444,7 +429,7 @@ const Wordle = () => {
                     !inputLetters["5"][2]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["5"][2]?.checked &&
-                        !inputLetters["5"][2]?.correct 
+                        !inputLetters["5"][2]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -457,7 +442,7 @@ const Wordle = () => {
                     !inputLetters["5"][3]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["5"][3]?.checked &&
-                        !inputLetters["5"][3]?.correct 
+                        !inputLetters["5"][3]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -470,7 +455,7 @@ const Wordle = () => {
                     !inputLetters["5"][4]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["5"][4]?.checked &&
-                        !inputLetters["5"][4]?.correct 
+                        !inputLetters["5"][4]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -485,7 +470,7 @@ const Wordle = () => {
                     !inputLetters["6"][0]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["6"][0]?.checked &&
-                        !inputLetters["6"][0]?.correct 
+                        !inputLetters["6"][0]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -498,7 +483,7 @@ const Wordle = () => {
                     !inputLetters["6"][1]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["6"][1]?.checked &&
-                        !inputLetters["6"][1]?.correct 
+                        !inputLetters["6"][1]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -511,7 +496,7 @@ const Wordle = () => {
                     !inputLetters["6"][2]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["6"][2]?.checked &&
-                        !inputLetters["6"][2]?.correct 
+                        !inputLetters["6"][2]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -524,7 +509,7 @@ const Wordle = () => {
                     !inputLetters["6"][3]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["6"][3]?.checked &&
-                        !inputLetters["6"][3]?.correct 
+                        !inputLetters["6"][3]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -537,7 +522,7 @@ const Wordle = () => {
                     !inputLetters["6"][4]?.checked
                       ? "cube line1 col-2"
                       : inputLetters["6"][4]?.checked &&
-                        !inputLetters["6"][4]?.correct 
+                        !inputLetters["6"][4]?.correct
                       ? "cube line1 col-2 wrong"
                       : "cube line1 col-2 correct"
                   }
@@ -774,7 +759,7 @@ const Wordle = () => {
                 <button
                   className="keyboard-button"
                   value="Del"
-                  //onClick={myfn.delclicked}
+                  onClick={onClickBackspace}
                 >
                   <BsBackspace />
                 </button>
