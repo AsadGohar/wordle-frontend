@@ -6,9 +6,23 @@ import axios from "axios";
 
 const Wordle = () => {
   const [currentRow, setCurrentRow] = useState(1);
-  const [currentLetter, setCurrentLetter] = useState('');
-  const [currentIndex, setCurrentIndex] = useState('');
+  const [currentLetter, setCurrentLetter] = useState("");
+  const [currentIndex, setCurrentIndex] = useState("");
   const [loader, setLoader] = useState(false);
+
+  const cellClassName = (row, index) => {
+    return inputLetters[String(row)][index]?.checked == null ||
+      !inputLetters[String(row)][index]?.checked
+      ? "cube line1 col-2"
+      : inputLetters[String(row)][index]?.checked &&
+        !inputLetters[String(row)][index]?.correct &&
+        inputLetters[String(row)][index]?.is_in_word
+      ? "cube line1 col-2 grey"
+      : !inputLetters[String(row)][index]?.correct &&
+        !inputLetters[String(row)][index]?.is_in_word
+      ? "cube line1 col-2 wrong"
+      : "cube line1 col-2 correct";
+  };
 
   const verifyWord = async (user_word, wordleId) => {
     setLoader(true);
@@ -27,14 +41,14 @@ const Wordle = () => {
           toast.success("user won");
         }
         if (!res.data.status && res.data.message !== "Word Not In The List") {
-          console.log('here',res?.data?.responseArr)
+          console.log("here", res?.data?.responseArr);
           setInputLetter((prevState) => ({
             ...prevState,
             [currentRow]: [...res?.data?.responseArr],
           }));
           setCurrentRow((prevState) => prevState + 1);
         } else {
-          toast.error (res.data.message);
+          toast.error(res.data.message);
         }
       }
       setLoader(false);
@@ -71,11 +85,16 @@ const Wordle = () => {
         ...prevState,
         [currentRow]: [
           ...prevState[currentRow],
-          { value: e.target.value, checked: false, correct: false },
+          {
+            value: e.target.value,
+            checked: false,
+            correct: false,
+            is_in_word: false,
+          },
         ],
       }));
-      setCurrentLetter(e.target.value)
-      setCurrentIndex(inputLetters[currentRow].length)
+      setCurrentLetter(e.target.value);
+      setCurrentIndex(inputLetters[currentRow].length);
     }
   };
 
@@ -101,16 +120,14 @@ const Wordle = () => {
 
     // removing the element using splice
     temp.splice(currentIndex, 1);
-    console.log(temp,'dsad',inputLetters[String(currentRow)])
+    console.log(temp, "dsad", inputLetters[String(currentRow)]);
 
     setInputLetter((prevState) => ({
       ...prevState,
-      [currentRow]: [
-        ...temp
-      ],
+      [currentRow]: [...temp],
     }));
-    if(!currentIndex==0){
-      setCurrentIndex((prevState)=>prevState-1)
+    if (!currentIndex == 0) {
+      setCurrentIndex((prevState) => prevState - 1);
     }
   };
 
@@ -129,404 +146,104 @@ const Wordle = () => {
           <div className="Board-module">
             <div className="Board-module-board">
               <div className="board-row">
-                <div
-                  className={
-                    inputLetters["1"][0]?.checked == null ||
-                    !inputLetters["1"][0]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["1"][0]?.checked &&
-                        !inputLetters["1"][0]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(1, 0)}>
                   {inputLetters["1"][0]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["1"][1]?.checked == null ||
-                    !inputLetters["1"][1]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["1"][1]?.checked &&
-                        !inputLetters["1"][1]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(1, 1)}>
                   {inputLetters["1"][1]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["1"][2]?.checked == null ||
-                    !inputLetters["1"][2]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["1"][2]?.checked &&
-                        !inputLetters["1"][2]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(1, 2)}>
                   {inputLetters["1"][2]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["1"][3]?.checked == null ||
-                    !inputLetters["1"][3]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["1"][3]?.checked &&
-                        !inputLetters["1"][3]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(1, 3)}>
                   {inputLetters["1"][3]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["1"][4]?.checked == null ||
-                    !inputLetters["1"][4]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["1"][4]?.checked &&
-                        !inputLetters["1"][4]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(1, 4)}>
                   {inputLetters["1"][4]?.value}
                 </div>
               </div>
               <div className="board-row">
-                <div
-                  className={
-                    inputLetters["2"][0]?.checked == null ||
-                    !inputLetters["2"][0]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["2"][0]?.checked &&
-                        !inputLetters["2"][0]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(2, 0)}>
                   {inputLetters["2"][0]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["2"][1]?.checked == null ||
-                    !inputLetters["2"][1]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["2"][1]?.checked &&
-                        !inputLetters["2"][1]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(2, 1)}>
                   {inputLetters["2"][1]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["2"][2]?.checked == null ||
-                    !inputLetters["2"][2]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["2"][2]?.checked &&
-                        !inputLetters["2"][2]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(2, 2)}>
                   {inputLetters["2"][2]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["2"][3]?.checked == null ||
-                    !inputLetters["2"][3]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["2"][3]?.checked &&
-                        !inputLetters["2"][3]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(2, 3)}>
                   {inputLetters["2"][3]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["2"][4]?.checked == null ||
-                    !inputLetters["2"][4]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["2"][4]?.checked &&
-                        !inputLetters["2"][4]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(2, 4)}>
                   {inputLetters["2"][4]?.value}
                 </div>
               </div>
               <div className="board-row">
-                <div
-                  className={
-                    inputLetters["3"][0]?.checked == null ||
-                    !inputLetters["3"][0]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["3"][0]?.checked &&
-                        !inputLetters["3"][0]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(3, 0)}>
                   {inputLetters["3"][0]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["3"][1]?.checked == null ||
-                    !inputLetters["3"][1]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["3"][1]?.checked &&
-                        !inputLetters["3"][1]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(3, 1)}>
                   {inputLetters["3"][1]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["3"][2]?.checked == null ||
-                    !inputLetters["3"][2]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["3"][2]?.checked &&
-                        !inputLetters["3"][2]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(3, 2)}>
                   {inputLetters["3"][2]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["3"][3]?.checked == null ||
-                    !inputLetters["3"][3]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["3"][3]?.checked &&
-                        !inputLetters["3"][3]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(3, 3)}>
                   {inputLetters["3"][3]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["3"][4]?.checked == null ||
-                    !inputLetters["3"][4]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["3"][4]?.checked &&
-                        !inputLetters["3"][4]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(3, 4)}>
                   {inputLetters["3"][4]?.value}
                 </div>
               </div>
               <div className="board-row">
-                <div
-                  className={
-                    inputLetters["4"][0]?.checked == null ||
-                    !inputLetters["4"][0]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["4"][0]?.checked &&
-                        !inputLetters["4"][0]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(4, 0)}>
                   {inputLetters["4"][0]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["4"][1]?.checked == null ||
-                    !inputLetters["4"][1]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["4"][1]?.checked &&
-                        !inputLetters["4"][1]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(4, 1)}>
                   {inputLetters["4"][1]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["4"][2]?.checked == null ||
-                    !inputLetters["4"][2]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["4"][2]?.checked &&
-                        !inputLetters["4"][2]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(4, 2)}>
                   {inputLetters["4"][2]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["4"][3]?.checked == null ||
-                    !inputLetters["4"][3]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["4"][3]?.checked &&
-                        !inputLetters["4"][3]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(4, 3)}>
                   {inputLetters["4"][3]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["4"][4]?.checked == null ||
-                    !inputLetters["4"][4]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["4"][4]?.checked &&
-                        !inputLetters["4"][4]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(4, 4)}>
                   {inputLetters["4"][4]?.value}
                 </div>
               </div>
               <div className="board-row">
-                <div
-                  className={
-                    inputLetters["5"][0]?.checked == null ||
-                    !inputLetters["5"][0]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["5"][0]?.checked &&
-                        !inputLetters["5"][0]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(5, 0)}>
                   {inputLetters["5"][0]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["5"][1]?.checked == null ||
-                    !inputLetters["5"][1]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["5"][1]?.checked &&
-                        !inputLetters["5"][1]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(5, 1)}>
                   {inputLetters["5"][1]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["5"][2]?.checked == null ||
-                    !inputLetters["5"][2]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["5"][2]?.checked &&
-                        !inputLetters["5"][2]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(5, 2)}>
                   {inputLetters["5"][2]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["5"][3]?.checked == null ||
-                    !inputLetters["5"][3]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["5"][3]?.checked &&
-                        !inputLetters["5"][3]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(5, 3)}>
                   {inputLetters["5"][3]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["5"][4]?.checked == null ||
-                    !inputLetters["5"][4]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["5"][4]?.checked &&
-                        !inputLetters["5"][4]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(5, 4)}>
                   {inputLetters["5"][4]?.value}
                 </div>
               </div>
               <div className="board-row">
-                <div
-                  className={
-                    inputLetters["6"][0]?.checked == null ||
-                    !inputLetters["6"][0]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["6"][0]?.checked &&
-                        !inputLetters["6"][0]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(6, 0)}>
                   {inputLetters["6"][0]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["6"][1]?.checked == null ||
-                    !inputLetters["6"][1]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["6"][1]?.checked &&
-                        !inputLetters["6"][1]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(6, 1)}>
                   {inputLetters["6"][1]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["6"][2]?.checked == null ||
-                    !inputLetters["6"][2]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["6"][2]?.checked &&
-                        !inputLetters["6"][2]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(6, 2)}>
                   {inputLetters["6"][2]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["6"][3]?.checked == null ||
-                    !inputLetters["6"][3]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["6"][3]?.checked &&
-                        !inputLetters["6"][3]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(6, 3)}>
                   {inputLetters["6"][3]?.value}
                 </div>
-                <div
-                  className={
-                    inputLetters["6"][4]?.checked == null ||
-                    !inputLetters["6"][4]?.checked
-                      ? "cube line1 col-2"
-                      : inputLetters["6"][4]?.checked &&
-                        !inputLetters["6"][4]?.correct
-                      ? "cube line1 col-2 wrong"
-                      : "cube line1 col-2 correct"
-                  }
-                >
+                <div className={cellClassName(6, 4)}>
                   {inputLetters["6"][4]?.value}
                 </div>
               </div>

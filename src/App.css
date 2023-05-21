@@ -160,6 +160,10 @@ body{
   background-color: red;
 }
 
+.grey {
+  background-color: grey;
+}
+
 .Keyboard-module {
   height: 200px;
   /* margin: 0 8px; */
