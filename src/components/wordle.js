@@ -10,16 +10,21 @@ const Wordle = () => {
   const [currentIndex, setCurrentIndex] = useState("");
   const [loader, setLoader] = useState(false);
 
+  let isLetterCheckedOrNull = (row, index) => inputLetters[String(row)][index]?.checked == null ||
+  !inputLetters[String(row)][index]?.checked
+
+  let isLetterIncorrectButInWord = (row,index) => inputLetters[String(row)][index]?.checked &&
+  !inputLetters[String(row)][index]?.correct && inputLetters[String(row)][index]?.is_in_word
+
+  let isLetterIncorrectAndNotInWord = (row,index) => !inputLetters[String(row)][index]?.correct &&
+  !inputLetters[String(row)][index]?.is_in_word
+
   const cellClassName = (row, index) => {
-    return inputLetters[String(row)][index]?.checked == null ||
-      !inputLetters[String(row)][index]?.checked
+    return isLetterCheckedOrNull(row,index)
       ? "cube line1 col-2"
-      : inputLetters[String(row)][index]?.checked &&
-        !inputLetters[String(row)][index]?.correct &&
-        inputLetters[String(row)][index]?.is_in_word
+      : isLetterIncorrectButInWord(row,index)
       ? "cube line1 col-2 grey"
-      : !inputLetters[String(row)][index]?.correct &&
-        !inputLetters[String(row)][index]?.is_in_word
+      : isLetterIncorrectAndNotInWord(row,index)
       ? "cube line1 col-2 wrong"
       : "cube line1 col-2 correct";
   };

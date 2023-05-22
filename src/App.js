@@ -9,6 +9,21 @@ function App() {
   const [startGame, setStartGame] = useState(false);
   const [loader, setLoader] = useState(false);
 
+  const endGame = async () => {
+    try {
+      let res = await axios.put("http://localhost:4000/api/wordle/abandon", {
+        wordle_id:localStorage.getItem("wordle_id")
+      });
+      if (res.data.status) {
+        toast.error("Ooops Time Out, Try again later");
+        setStartGame(false);
+      }
+    } catch (error) {
+      toast.error("Ooops Time Out, Try again later");
+      setStartGame(false);
+    }
+  };
+
   const createGame = async () => {
     try {
       setLoader(true);
@@ -17,9 +32,13 @@ function App() {
         userAddress: "sasdadasddas",
       });
       if (res?.data?.status) {
+        console.log(Number(res.data.time),'time')
         localStorage.setItem("wordle_id", res.data.wordleGameId);
         setStartGame(true);
         setLoader(false);
+        setTimeout(() => {
+          endGame();
+        }, Number(res.data.time));
       } else {
         toast.error(res?.data?.message);
         setLoader(false);
