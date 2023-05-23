@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BsBackspace } from "react-icons/bs";
 import { AiOutlineEnter } from "react-icons/ai";
 import { toast } from "react-toastify";
@@ -6,25 +6,95 @@ import axios from "axios";
 
 const Wordle = () => {
   const [currentRow, setCurrentRow] = useState(1);
-  const [currentLetter, setCurrentLetter] = useState("");
   const [currentIndex, setCurrentIndex] = useState("");
   const [loader, setLoader] = useState(false);
+  const [inputLetters, setInputLetter] = useState({
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+  });
 
-  let isLetterCheckedOrNull = (row, index) => inputLetters[String(row)][index]?.checked == null ||
-  !inputLetters[String(row)][index]?.checked
+  const handleKeyPress = useCallback(
+    (event) => {
+      if (event.which >= 65 && event.which <= 90) {
+        if (inputLetters[String(currentRow)].length == 5) {
+          toast.error("Press Enter to Continue");
+        }  else {
+          setInputLetter((prevState) => ({
+            ...prevState,
+            [currentRow]: [
+              ...prevState[currentRow],
+              {
+                value: String(event.key).toUpperCase(),
+                checked: false,
+                correct: false,
+                is_in_word: false,
+              },
+            ],
+          }));
+          setCurrentIndex(inputLetters[currentRow].length);
+        }
+      }
+      else if (event.which == 13) {
+        if (currentRow > 6) {
+          toast.error("Failed");
+        } else if (checkIfComplete(inputLetters[String(currentRow)])) {
+          verifyWord(
+            inputLetters[String(currentRow)],
+            Number(localStorage.getItem("wordle_id"))
+          );
+        } else {
+          toast.error("Please Complete the Word");
+        }
+      } else if (event.which == 8) {
+        const temp = [...inputLetters[String(currentRow)]];
 
-  let isLetterIncorrectButInWord = (row,index) => inputLetters[String(row)][index]?.checked &&
-  !inputLetters[String(row)][index]?.correct && inputLetters[String(row)][index]?.is_in_word
+        // removing the element using splice
+        temp.splice(currentIndex, 1);
+        console.log(temp, "dsad", inputLetters[String(currentRow)]);
 
-  let isLetterIncorrectAndNotInWord = (row,index) => !inputLetters[String(row)][index]?.correct &&
-  !inputLetters[String(row)][index]?.is_in_word
+        setInputLetter((prevState) => ({
+          ...prevState,
+          [currentRow]: [...temp],
+        }));
+        if (!currentIndex == 0) {
+          setCurrentIndex((prevState) => prevState - 1);
+        }
+      }
+    },
+    [inputLetters]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
+  let isLetterCheckedOrNull = (row, index) =>
+    inputLetters[String(row)][index]?.checked == null ||
+    !inputLetters[String(row)][index]?.checked;
+
+  let isLetterIncorrectButInWord = (row, index) =>
+    inputLetters[String(row)][index]?.checked &&
+    !inputLetters[String(row)][index]?.correct &&
+    inputLetters[String(row)][index]?.is_in_word;
+
+  let isLetterIncorrectAndNotInWord = (row, index) =>
+    !inputLetters[String(row)][index]?.correct &&
+    !inputLetters[String(row)][index]?.is_in_word;
 
   const cellClassName = (row, index) => {
-    return isLetterCheckedOrNull(row,index)
+    return isLetterCheckedOrNull(row, index)
       ? "cube line1 col-2"
-      : isLetterIncorrectButInWord(row,index)
+      : isLetterIncorrectButInWord(row, index)
       ? "cube line1 col-2 grey"
-      : isLetterIncorrectAndNotInWord(row,index)
+      : isLetterIncorrectAndNotInWord(row, index)
       ? "cube line1 col-2 wrong"
       : "cube line1 col-2 correct";
   };
@@ -72,15 +142,6 @@ const Wordle = () => {
     return word;
   };
 
-  const [inputLetters, setInputLetter] = useState({
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-  });
-
   const onClickAlphabet = (e) => {
     e.preventDefault();
     if (inputLetters[String(currentRow)].length == 5) {
@@ -98,7 +159,6 @@ const Wordle = () => {
           },
         ],
       }));
-      setCurrentLetter(e.target.value);
       setCurrentIndex(inputLetters[currentRow].length);
     }
   };
