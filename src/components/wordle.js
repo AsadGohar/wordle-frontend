@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import { BsBackspace } from "react-icons/bs";
 import { AiOutlineEnter } from "react-icons/ai";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
-const Wordle = () => {
+const Wordle = ({ id }) => {
   const [currentRow, setCurrentRow] = useState(1);
   const [currentIndex, setCurrentIndex] = useState("");
   const [loader, setLoader] = useState(false);
@@ -16,13 +16,15 @@ const Wordle = () => {
     5: [],
     6: [],
   });
+  const [wrongLetters, setWrongLetters] = useState([]);
+  const [misplacedLetters, setMisplacedLetters] = useState([]);
 
   const handleKeyPress = useCallback(
     (event) => {
       if (event.which >= 65 && event.which <= 90) {
         if (inputLetters[String(currentRow)].length == 5) {
           toast.error("Press Enter to Continue");
-        }  else {
+        } else {
           setInputLetter((prevState) => ({
             ...prevState,
             [currentRow]: [
@@ -37,15 +39,11 @@ const Wordle = () => {
           }));
           setCurrentIndex(inputLetters[currentRow].length);
         }
-      }
-      else if (event.which == 13) {
+      } else if (event.which == 13) {
         if (currentRow > 6) {
           toast.error("Failed");
         } else if (checkIfComplete(inputLetters[String(currentRow)])) {
-          verifyWord(
-            inputLetters[String(currentRow)],
-            Number(localStorage.getItem("wordle_id"))
-          );
+          verifyWord(inputLetters[String(currentRow)], id);
         } else {
           toast.error("Please Complete the Word");
         }
@@ -89,14 +87,27 @@ const Wordle = () => {
     !inputLetters[String(row)][index]?.correct &&
     !inputLetters[String(row)][index]?.is_in_word;
 
+  let isLetterIncorrect = (value) => {
+    return wrongLetters.includes(value);
+  };
+  let isLetterMisplaced = (value) => misplacedLetters.includes(value);
+
   const cellClassName = (row, index) => {
     return isLetterCheckedOrNull(row, index)
       ? "cube line1 col-2"
       : isLetterIncorrectButInWord(row, index)
-      ? "cube line1 col-2 grey"
+      ? "cube line1 col-2 yellow"
       : isLetterIncorrectAndNotInWord(row, index)
       ? "cube line1 col-2 wrong"
       : "cube line1 col-2 correct";
+  };
+
+  const keyboardClassName = (value) => {
+    return isLetterIncorrect(value)
+      ? "keyboard-button wrong"
+      : isLetterMisplaced(value)
+      ? "keyboard-button yellow"
+      : "keyboard-button";
   };
 
   const verifyWord = async (user_word, wordleId) => {
@@ -104,7 +115,7 @@ const Wordle = () => {
     try {
       let word = getWord();
       console.log(word, "word");
-      let res = await axios.post("http://localhost:4000/api/wordle/attempt", {
+      let res = await axiosInstance.post("/wordle/attempt", {
         user_word,
         wordleId,
         word,
@@ -116,11 +127,26 @@ const Wordle = () => {
           toast.success("user won");
         }
         if (!res.data.status && res.data.message !== "Word Not In The List") {
-          console.log("here", res?.data?.responseArr);
+          // console.log("here", res?.data?.responseArr);
           setInputLetter((prevState) => ({
             ...prevState,
             [currentRow]: [...res?.data?.responseArr],
           }));
+          // {
+          //   value: e.target.value,
+          //   checked: false,
+          //   correct: false,
+          //   is_in_word: false,
+          // },
+          let wrong = res?.data?.responseArr
+            .filter((item) => !item.correct && !item.is_in_word)
+            .map((item) => String(item.value).toUpperCase());
+          let misplace = res?.data?.responseArr
+            .filter((item) => !item.correct && item.is_in_word)
+            .map((item) => String(item.value).toUpperCase());
+          console.log(wrong, misplace);
+          setWrongLetters((prev) => [prev, ...wrong]);
+          setMisplacedLetters((prev) => [prev, ...misplace]);
           setCurrentRow((prevState) => prevState + 1);
         } else {
           toast.error(res.data.message);
@@ -168,10 +194,7 @@ const Wordle = () => {
     if (currentRow > 6) {
       toast.error("Failed");
     } else if (checkIfComplete(inputLetters[String(currentRow)])) {
-      verifyWord(
-        inputLetters[String(currentRow)],
-        Number(localStorage.getItem("wordle_id"))
-      );
+      verifyWord(inputLetters[String(currentRow)], id);
     } else {
       toast.error("Please Complete the Word");
     }
@@ -318,7 +341,7 @@ const Wordle = () => {
             <div id="keyboard-cont">
               <div className="first-row">
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("Q")}
                   value="Q"
                   id="Q"
                   onClick={onClickAlphabet}
@@ -326,7 +349,7 @@ const Wordle = () => {
                   q
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("W")}
                   value="W"
                   id="W"
                   onClick={onClickAlphabet}
@@ -334,7 +357,7 @@ const Wordle = () => {
                   w
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("E")}
                   value="E"
                   id="E"
                   onClick={onClickAlphabet}
@@ -342,7 +365,7 @@ const Wordle = () => {
                   e
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("R")}
                   value="R"
                   id="R"
                   onClick={onClickAlphabet}
@@ -350,7 +373,7 @@ const Wordle = () => {
                   r
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("T")}
                   value="T"
                   id="T"
                   onClick={onClickAlphabet}
@@ -358,7 +381,7 @@ const Wordle = () => {
                   t
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("Y")}
                   value="Y"
                   id="Y"
                   onClick={onClickAlphabet}
@@ -366,7 +389,7 @@ const Wordle = () => {
                   y
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("U")}
                   value="U"
                   id="U"
                   onClick={onClickAlphabet}
@@ -374,7 +397,7 @@ const Wordle = () => {
                   u
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("I")}
                   value="I"
                   id="I"
                   onClick={onClickAlphabet}
@@ -382,7 +405,7 @@ const Wordle = () => {
                   i
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("O")}
                   value="O"
                   id="O"
                   onClick={onClickAlphabet}
@@ -390,7 +413,7 @@ const Wordle = () => {
                   o
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("P")}
                   value="P"
                   id="P"
                   onClick={onClickAlphabet}
@@ -401,7 +424,7 @@ const Wordle = () => {
               <div className="second-row">
                 <div className="flex-div"></div>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("A")}
                   value="A"
                   id="A"
                   onClick={onClickAlphabet}
@@ -409,7 +432,7 @@ const Wordle = () => {
                   a
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("S")}
                   value="S"
                   id="S"
                   onClick={onClickAlphabet}
@@ -417,7 +440,7 @@ const Wordle = () => {
                   s
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("D")}
                   value="D"
                   id="D"
                   onClick={onClickAlphabet}
@@ -425,7 +448,7 @@ const Wordle = () => {
                   d
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("F")}
                   value="F"
                   id="F"
                   onClick={onClickAlphabet}
@@ -433,7 +456,7 @@ const Wordle = () => {
                   f
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("G")}
                   value="G"
                   id="G"
                   onClick={onClickAlphabet}
@@ -441,7 +464,7 @@ const Wordle = () => {
                   g
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("H")}
                   value="H"
                   id="H"
                   onClick={onClickAlphabet}
@@ -449,7 +472,7 @@ const Wordle = () => {
                   h
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("J")}
                   value="J"
                   id="J"
                   onClick={onClickAlphabet}
@@ -457,7 +480,7 @@ const Wordle = () => {
                   j
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("K")}
                   value="K"
                   id="K"
                   onClick={onClickAlphabet}
@@ -465,7 +488,7 @@ const Wordle = () => {
                   k
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("L")}
                   value="L"
                   id="L"
                   onClick={onClickAlphabet}
@@ -483,7 +506,7 @@ const Wordle = () => {
                   <AiOutlineEnter />
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("Z")}
                   value="Z"
                   id="Z"
                   onClick={onClickAlphabet}
@@ -491,7 +514,7 @@ const Wordle = () => {
                   z
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("X")}
                   value="X"
                   id="X"
                   onClick={onClickAlphabet}
@@ -499,7 +522,7 @@ const Wordle = () => {
                   x
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("C")}
                   value="C"
                   id="C"
                   onClick={onClickAlphabet}
@@ -507,7 +530,7 @@ const Wordle = () => {
                   c
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("V")}
                   value="V"
                   id="V"
                   onClick={onClickAlphabet}
@@ -515,7 +538,7 @@ const Wordle = () => {
                   v
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("B")}
                   value="B"
                   id="B"
                   onClick={onClickAlphabet}
@@ -523,7 +546,7 @@ const Wordle = () => {
                   b
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("N")}
                   value="N"
                   id="N"
                   onClick={onClickAlphabet}
@@ -531,7 +554,7 @@ const Wordle = () => {
                   n
                 </button>
                 <button
-                  className="keyboard-button"
+                  className={keyboardClassName("M")}
                   value="M"
                   id="M"
                   onClick={onClickAlphabet}

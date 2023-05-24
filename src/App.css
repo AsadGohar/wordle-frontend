@@ -153,15 +153,15 @@ body{
 }
 
 .correct {
-  background-color: green;
+  background-color: green !important;
 }
 
 .wrong {
-  background-color: red;
+  background-color: grey !important;
 }
 
-.grey {
-  background-color: grey;
+.yellow {
+  background-color: yellow !important;
 }
 
 .Keyboard-module {
