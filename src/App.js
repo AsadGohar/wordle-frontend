@@ -30,11 +30,11 @@ function App() {
     try {
       setLoader(true);
       let res = await axiosInstance.post("/wordle/create", {
-        contestant: 58,
+        contestant: 73,
         userAddress: "sasdadasddas",
       });
       if (res?.data?.status) {
-        console.log(Number(res.data.time),'time')
+        // console.log(Number(res.data.time),'time')
         setWordleId(res.data.wordleGameId)
         setStartGame(true);
         setLoader(false);

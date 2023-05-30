@@ -8,6 +8,7 @@ const Wordle = ({ id }) => {
   const [currentRow, setCurrentRow] = useState(1);
   const [currentIndex, setCurrentIndex] = useState("");
   const [loader, setLoader] = useState(false);
+  const [hasUserWon, setHasUserWon] = useState(false);
   const [inputLetters, setInputLetter] = useState({
     1: [],
     2: [],
@@ -18,10 +19,19 @@ const Wordle = ({ id }) => {
   });
   const [wrongLetters, setWrongLetters] = useState([]);
   const [misplacedLetters, setMisplacedLetters] = useState([]);
+  const [correctLetters, setCorrectLetters] = useState([]);
+  const [isCheckedRow, setIsCheckedRow] = useState({
+    1:false,
+    2:false,
+    3:false,
+    4:false,
+    5:false
+  })
 
   const handleKeyPress = useCallback(
     (event) => {
       if (event.which >= 65 && event.which <= 90) {
+        // console.log(inputLetters[String(currentRow)].length, "l");
         if (inputLetters[String(currentRow)].length == 5) {
           toast.error("Press Enter to Continue");
         } else {
@@ -52,7 +62,7 @@ const Wordle = ({ id }) => {
 
         // removing the element using splice
         temp.splice(currentIndex, 1);
-        console.log(temp, "dsad", inputLetters[String(currentRow)]);
+        // console.log(temp, "dsad", inputLetters[String(currentRow)]);
 
         setInputLetter((prevState) => ({
           ...prevState,
@@ -91,6 +101,7 @@ const Wordle = ({ id }) => {
     return wrongLetters.includes(value);
   };
   let isLetterMisplaced = (value) => misplacedLetters.includes(value);
+  let isLetterCorrect = (value) => correctLetters.includes(value);
 
   const cellClassName = (row, index) => {
     return isLetterCheckedOrNull(row, index)
@@ -107,14 +118,21 @@ const Wordle = ({ id }) => {
       ? "keyboard-button wrong"
       : isLetterMisplaced(value)
       ? "keyboard-button yellow"
+      : isLetterCorrect(value)
+      ? "keyboard-button correct"
       : "keyboard-button";
   };
 
   const verifyWord = async (user_word, wordleId) => {
     setLoader(true);
     try {
+      if (hasUserWon) {
+        setLoader(true);
+        toast.success("User Has Already Won");
+        return;
+      }
       let word = getWord();
-      console.log(word, "word");
+      // console.log(word, "word");
       let res = await axiosInstance.post("/wordle/attempt", {
         user_word,
         wordleId,
@@ -125,6 +143,10 @@ const Wordle = ({ id }) => {
 
         if (res.data.user_won) {
           toast.success("user won");
+          setHasUserWon(true);
+        }
+        if (res.data.game_over) {
+          toast.success("Game Already Over");
         }
         if (!res.data.status && res.data.message !== "Word Not In The List") {
           // console.log("here", res?.data?.responseArr);
@@ -144,12 +166,21 @@ const Wordle = ({ id }) => {
           let misplace = res?.data?.responseArr
             .filter((item) => !item.correct && item.is_in_word)
             .map((item) => String(item.value).toUpperCase());
+          let correct = res?.data?.responseArr
+            .filter((item) => item.correct)
+            .map((item) => String(item.value).toUpperCase());
           console.log(wrong, misplace);
-          setWrongLetters((prev) => [prev, ...wrong]);
-          setMisplacedLetters((prev) => [prev, ...misplace]);
+          setWrongLetters((prev) => [...prev, ...wrong]);
+          setMisplacedLetters((prev) => [...prev, ...misplace]);
+          setCorrectLetters((prev) => [...prev, ...correct]);
+          setIsCheckedRow(prev=> ({
+            ...prev,
+            [currentRow]:true
+          }))
           setCurrentRow((prevState) => prevState + 1);
         } else {
           toast.error(res.data.message);
+          // setCurrentRow((prevState) => prevState + 1);
         }
       }
       setLoader(false);
@@ -162,7 +193,7 @@ const Wordle = ({ id }) => {
   const getWord = () => {
     let word = "";
     for (let index = 0; index < 5; index++) {
-      console.log();
+      // console.log();
       word += inputLetters[currentRow][index].value;
     }
     return word;
@@ -170,6 +201,10 @@ const Wordle = ({ id }) => {
 
   const onClickAlphabet = (e) => {
     e.preventDefault();
+    if(!isCheckedRow[String(currentRow)] && inputLetters[String(currentRow)].length == 5){
+      toast.error("use backspace to remove words");
+      return
+    }
     if (inputLetters[String(currentRow)].length == 5) {
       toast.error("Press Enter to Continue");
     } else {
@@ -208,7 +243,7 @@ const Wordle = ({ id }) => {
 
     // removing the element using splice
     temp.splice(currentIndex, 1);
-    console.log(temp, "dsad", inputLetters[String(currentRow)]);
+    // console.log(temp, "dsad", inputLetters[String(currentRow)]);
 
     setInputLetter((prevState) => ({
       ...prevState,
