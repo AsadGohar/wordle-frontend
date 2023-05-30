@@ -127,7 +127,7 @@ const Wordle = ({ id }) => {
     setLoader(true);
     try {
       if (hasUserWon) {
-        setLoader(true);
+        setLoader(false);
         toast.success("User Has Already Won");
         return;
       }
