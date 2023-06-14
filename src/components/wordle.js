@@ -3,8 +3,58 @@ import { BsBackspace } from "react-icons/bs";
 import { AiOutlineEnter } from "react-icons/ai";
 import { toast } from "react-toastify";
 import axiosInstance from "../utils/axiosInstance";
+import { timerSeconds } from "../utils/consts";
 
-const Wordle = ({ id }) => {
+const Wordle = () => {
+  const [startGame, setStartGame] = useState(false);
+  const [startGameLoader, setStartGameLoader] = useState(false);
+  const [wordleId, setWordleId] = useState("");
+
+  const endGame = async (wordleId) => {
+    try {
+      let res = await axiosInstance.put("/wordle/abandon", {
+        wordle_id: wordleId,
+      });
+      if (res.data.status) {
+        toast.error("Ooops Time Out, Try again later");
+        setStartGame(false);
+      }
+    } catch (error) {
+      toast.error("Ooops Time Out, Try again later");
+      setStartGame(false);
+    }
+  };
+
+  const createGame = async () => {
+    try {
+      setStartGameLoader(true);
+      let res = await axiosInstance.post("/wordle/create", {
+        contestant: 732209,
+        userAddress: "sasdadasddas",
+      });
+      if (res?.data?.status) {
+        // console.log(Number(res.data.time),'time')
+        setWordleId(res.data.wordleGameId);
+        setStartGame(true);
+        setStartGameLoader(false);
+        setTimeout(() => {
+          endGame(res.data.wordleGameId);
+        }, Number(timerSeconds) * 1000);
+      } else {
+        toast.error(res?.data?.message);
+        setStartGameLoader(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setStartGameLoader(false);
+    }
+  };
+
+  const handleStartGame = (e) => {
+    e.preventDefault();
+    createGame();
+  };
+
   const [currentRow, setCurrentRow] = useState(1);
   const [currentIndex, setCurrentIndex] = useState("");
   const [loader, setLoader] = useState(false);
@@ -21,12 +71,12 @@ const Wordle = ({ id }) => {
   const [misplacedLetters, setMisplacedLetters] = useState([]);
   const [correctLetters, setCorrectLetters] = useState([]);
   const [isCheckedRow, setIsCheckedRow] = useState({
-    1:false,
-    2:false,
-    3:false,
-    4:false,
-    5:false
-  })
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+  });
 
   const handleKeyPress = useCallback(
     (event) => {
@@ -53,7 +103,7 @@ const Wordle = ({ id }) => {
         if (currentRow > 6) {
           toast.error("Failed");
         } else if (checkIfComplete(inputLetters[String(currentRow)])) {
-          verifyWord(inputLetters[String(currentRow)], id);
+          verifyWord(inputLetters[String(currentRow)], wordleId);
         } else {
           toast.error("Please Complete the Word");
         }
@@ -169,14 +219,14 @@ const Wordle = ({ id }) => {
           let correct = res?.data?.responseArr
             .filter((item) => item.correct)
             .map((item) => String(item.value).toUpperCase());
-          console.log(wrong, misplace);
+          // console.log(wrong, misplace);
           setWrongLetters((prev) => [...prev, ...wrong]);
           setMisplacedLetters((prev) => [...prev, ...misplace]);
           setCorrectLetters((prev) => [...prev, ...correct]);
-          setIsCheckedRow(prev=> ({
+          setIsCheckedRow((prev) => ({
             ...prev,
-            [currentRow]:true
-          }))
+            [currentRow]: true,
+          }));
           setCurrentRow((prevState) => prevState + 1);
         } else {
           toast.error(res.data.message);
@@ -201,9 +251,12 @@ const Wordle = ({ id }) => {
 
   const onClickAlphabet = (e) => {
     e.preventDefault();
-    if(!isCheckedRow[String(currentRow)] && inputLetters[String(currentRow)].length == 5){
+    if (
+      !isCheckedRow[String(currentRow)] &&
+      inputLetters[String(currentRow)].length == 5
+    ) {
       toast.error("use backspace to remove words");
-      return
+      return;
     }
     if (inputLetters[String(currentRow)].length == 5) {
       toast.error("Press Enter to Continue");
@@ -229,7 +282,7 @@ const Wordle = ({ id }) => {
     if (currentRow > 6) {
       toast.error("Failed");
     } else if (checkIfComplete(inputLetters[String(currentRow)])) {
-      verifyWord(inputLetters[String(currentRow)], id);
+      verifyWord(inputLetters[String(currentRow)], wordleId);
     } else {
       toast.error("Please Complete the Word");
     }
@@ -259,354 +312,366 @@ const Wordle = ({ id }) => {
   };
 
   return (
-    <div className="game-body">
-      {loader ? (
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
+    <div className="App app-wrapper">
+      {startGameLoader ? (
+        <div className="loader"></div>
+      ) : !startGameLoader && startGame ? (
+        <div className="game-body">
+          {loader ? (
+            <div className="loader"></div>
+          ) : (
+            <>
+              <div className="Board-module">
+                <div className="Board-module-board">
+                  <div className="board-row">
+                    <div className={cellClassName(1, 0)}>
+                      {inputLetters["1"][0]?.value}
+                    </div>
+                    <div className={cellClassName(1, 1)}>
+                      {inputLetters["1"][1]?.value}
+                    </div>
+                    <div className={cellClassName(1, 2)}>
+                      {inputLetters["1"][2]?.value}
+                    </div>
+                    <div className={cellClassName(1, 3)}>
+                      {inputLetters["1"][3]?.value}
+                    </div>
+                    <div className={cellClassName(1, 4)}>
+                      {inputLetters["1"][4]?.value}
+                    </div>
+                  </div>
+                  <div className="board-row">
+                    <div className={cellClassName(2, 0)}>
+                      {inputLetters["2"][0]?.value}
+                    </div>
+                    <div className={cellClassName(2, 1)}>
+                      {inputLetters["2"][1]?.value}
+                    </div>
+                    <div className={cellClassName(2, 2)}>
+                      {inputLetters["2"][2]?.value}
+                    </div>
+                    <div className={cellClassName(2, 3)}>
+                      {inputLetters["2"][3]?.value}
+                    </div>
+                    <div className={cellClassName(2, 4)}>
+                      {inputLetters["2"][4]?.value}
+                    </div>
+                  </div>
+                  <div className="board-row">
+                    <div className={cellClassName(3, 0)}>
+                      {inputLetters["3"][0]?.value}
+                    </div>
+                    <div className={cellClassName(3, 1)}>
+                      {inputLetters["3"][1]?.value}
+                    </div>
+                    <div className={cellClassName(3, 2)}>
+                      {inputLetters["3"][2]?.value}
+                    </div>
+                    <div className={cellClassName(3, 3)}>
+                      {inputLetters["3"][3]?.value}
+                    </div>
+                    <div className={cellClassName(3, 4)}>
+                      {inputLetters["3"][4]?.value}
+                    </div>
+                  </div>
+                  <div className="board-row">
+                    <div className={cellClassName(4, 0)}>
+                      {inputLetters["4"][0]?.value}
+                    </div>
+                    <div className={cellClassName(4, 1)}>
+                      {inputLetters["4"][1]?.value}
+                    </div>
+                    <div className={cellClassName(4, 2)}>
+                      {inputLetters["4"][2]?.value}
+                    </div>
+                    <div className={cellClassName(4, 3)}>
+                      {inputLetters["4"][3]?.value}
+                    </div>
+                    <div className={cellClassName(4, 4)}>
+                      {inputLetters["4"][4]?.value}
+                    </div>
+                  </div>
+                  <div className="board-row">
+                    <div className={cellClassName(5, 0)}>
+                      {inputLetters["5"][0]?.value}
+                    </div>
+                    <div className={cellClassName(5, 1)}>
+                      {inputLetters["5"][1]?.value}
+                    </div>
+                    <div className={cellClassName(5, 2)}>
+                      {inputLetters["5"][2]?.value}
+                    </div>
+                    <div className={cellClassName(5, 3)}>
+                      {inputLetters["5"][3]?.value}
+                    </div>
+                    <div className={cellClassName(5, 4)}>
+                      {inputLetters["5"][4]?.value}
+                    </div>
+                  </div>
+                  <div className="board-row">
+                    <div className={cellClassName(6, 0)}>
+                      {inputLetters["6"][0]?.value}
+                    </div>
+                    <div className={cellClassName(6, 1)}>
+                      {inputLetters["6"][1]?.value}
+                    </div>
+                    <div className={cellClassName(6, 2)}>
+                      {inputLetters["6"][2]?.value}
+                    </div>
+                    <div className={cellClassName(6, 3)}>
+                      {inputLetters["6"][3]?.value}
+                    </div>
+                    <div className={cellClassName(6, 4)}>
+                      {inputLetters["6"][4]?.value}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="Keyboard-module">
+                <div id="keyboard-cont">
+                  <div className="first-row">
+                    <button
+                      className={keyboardClassName("Q")}
+                      value="Q"
+                      id="Q"
+                      onClick={onClickAlphabet}
+                    >
+                      q
+                    </button>
+                    <button
+                      className={keyboardClassName("W")}
+                      value="W"
+                      id="W"
+                      onClick={onClickAlphabet}
+                    >
+                      w
+                    </button>
+                    <button
+                      className={keyboardClassName("E")}
+                      value="E"
+                      id="E"
+                      onClick={onClickAlphabet}
+                    >
+                      e
+                    </button>
+                    <button
+                      className={keyboardClassName("R")}
+                      value="R"
+                      id="R"
+                      onClick={onClickAlphabet}
+                    >
+                      r
+                    </button>
+                    <button
+                      className={keyboardClassName("T")}
+                      value="T"
+                      id="T"
+                      onClick={onClickAlphabet}
+                    >
+                      t
+                    </button>
+                    <button
+                      className={keyboardClassName("Y")}
+                      value="Y"
+                      id="Y"
+                      onClick={onClickAlphabet}
+                    >
+                      y
+                    </button>
+                    <button
+                      className={keyboardClassName("U")}
+                      value="U"
+                      id="U"
+                      onClick={onClickAlphabet}
+                    >
+                      u
+                    </button>
+                    <button
+                      className={keyboardClassName("I")}
+                      value="I"
+                      id="I"
+                      onClick={onClickAlphabet}
+                    >
+                      i
+                    </button>
+                    <button
+                      className={keyboardClassName("O")}
+                      value="O"
+                      id="O"
+                      onClick={onClickAlphabet}
+                    >
+                      o
+                    </button>
+                    <button
+                      className={keyboardClassName("P")}
+                      value="P"
+                      id="P"
+                      onClick={onClickAlphabet}
+                    >
+                      p
+                    </button>
+                  </div>
+                  <div className="second-row">
+                    <div className="flex-div"></div>
+                    <button
+                      className={keyboardClassName("A")}
+                      value="A"
+                      id="A"
+                      onClick={onClickAlphabet}
+                    >
+                      a
+                    </button>
+                    <button
+                      className={keyboardClassName("S")}
+                      value="S"
+                      id="S"
+                      onClick={onClickAlphabet}
+                    >
+                      s
+                    </button>
+                    <button
+                      className={keyboardClassName("D")}
+                      value="D"
+                      id="D"
+                      onClick={onClickAlphabet}
+                    >
+                      d
+                    </button>
+                    <button
+                      className={keyboardClassName("F")}
+                      value="F"
+                      id="F"
+                      onClick={onClickAlphabet}
+                    >
+                      f
+                    </button>
+                    <button
+                      className={keyboardClassName("G")}
+                      value="G"
+                      id="G"
+                      onClick={onClickAlphabet}
+                    >
+                      g
+                    </button>
+                    <button
+                      className={keyboardClassName("H")}
+                      value="H"
+                      id="H"
+                      onClick={onClickAlphabet}
+                    >
+                      h
+                    </button>
+                    <button
+                      className={keyboardClassName("J")}
+                      value="J"
+                      id="J"
+                      onClick={onClickAlphabet}
+                    >
+                      j
+                    </button>
+                    <button
+                      className={keyboardClassName("K")}
+                      value="K"
+                      id="K"
+                      onClick={onClickAlphabet}
+                    >
+                      k
+                    </button>
+                    <button
+                      className={keyboardClassName("L")}
+                      value="L"
+                      id="L"
+                      onClick={onClickAlphabet}
+                    >
+                      l
+                    </button>
+                    <div className="flex-div"></div>
+                  </div>
+                  <div className="third-row">
+                    <button
+                      className="keyboard-button"
+                      value="Enter"
+                      onClick={onClickEnter}
+                    >
+                      <AiOutlineEnter />
+                    </button>
+                    <button
+                      className={keyboardClassName("Z")}
+                      value="Z"
+                      id="Z"
+                      onClick={onClickAlphabet}
+                    >
+                      z
+                    </button>
+                    <button
+                      className={keyboardClassName("X")}
+                      value="X"
+                      id="X"
+                      onClick={onClickAlphabet}
+                    >
+                      x
+                    </button>
+                    <button
+                      className={keyboardClassName("C")}
+                      value="C"
+                      id="C"
+                      onClick={onClickAlphabet}
+                    >
+                      c
+                    </button>
+                    <button
+                      className={keyboardClassName("V")}
+                      value="V"
+                      id="V"
+                      onClick={onClickAlphabet}
+                    >
+                      v
+                    </button>
+                    <button
+                      className={keyboardClassName("B")}
+                      value="B"
+                      id="B"
+                      onClick={onClickAlphabet}
+                    >
+                      b
+                    </button>
+                    <button
+                      className={keyboardClassName("N")}
+                      value="N"
+                      id="N"
+                      onClick={onClickAlphabet}
+                    >
+                      n
+                    </button>
+                    <button
+                      className={keyboardClassName("M")}
+                      value="M"
+                      id="M"
+                      onClick={onClickAlphabet}
+                    >
+                      m
+                    </button>
+                    <button
+                      className="keyboard-button"
+                      value="Del"
+                      onClick={onClickBackspace}
+                    >
+                      <BsBackspace />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       ) : (
-        <>
-          <div className="Board-module">
-            <div className="Board-module-board">
-              <div className="board-row">
-                <div className={cellClassName(1, 0)}>
-                  {inputLetters["1"][0]?.value}
-                </div>
-                <div className={cellClassName(1, 1)}>
-                  {inputLetters["1"][1]?.value}
-                </div>
-                <div className={cellClassName(1, 2)}>
-                  {inputLetters["1"][2]?.value}
-                </div>
-                <div className={cellClassName(1, 3)}>
-                  {inputLetters["1"][3]?.value}
-                </div>
-                <div className={cellClassName(1, 4)}>
-                  {inputLetters["1"][4]?.value}
-                </div>
-              </div>
-              <div className="board-row">
-                <div className={cellClassName(2, 0)}>
-                  {inputLetters["2"][0]?.value}
-                </div>
-                <div className={cellClassName(2, 1)}>
-                  {inputLetters["2"][1]?.value}
-                </div>
-                <div className={cellClassName(2, 2)}>
-                  {inputLetters["2"][2]?.value}
-                </div>
-                <div className={cellClassName(2, 3)}>
-                  {inputLetters["2"][3]?.value}
-                </div>
-                <div className={cellClassName(2, 4)}>
-                  {inputLetters["2"][4]?.value}
-                </div>
-              </div>
-              <div className="board-row">
-                <div className={cellClassName(3, 0)}>
-                  {inputLetters["3"][0]?.value}
-                </div>
-                <div className={cellClassName(3, 1)}>
-                  {inputLetters["3"][1]?.value}
-                </div>
-                <div className={cellClassName(3, 2)}>
-                  {inputLetters["3"][2]?.value}
-                </div>
-                <div className={cellClassName(3, 3)}>
-                  {inputLetters["3"][3]?.value}
-                </div>
-                <div className={cellClassName(3, 4)}>
-                  {inputLetters["3"][4]?.value}
-                </div>
-              </div>
-              <div className="board-row">
-                <div className={cellClassName(4, 0)}>
-                  {inputLetters["4"][0]?.value}
-                </div>
-                <div className={cellClassName(4, 1)}>
-                  {inputLetters["4"][1]?.value}
-                </div>
-                <div className={cellClassName(4, 2)}>
-                  {inputLetters["4"][2]?.value}
-                </div>
-                <div className={cellClassName(4, 3)}>
-                  {inputLetters["4"][3]?.value}
-                </div>
-                <div className={cellClassName(4, 4)}>
-                  {inputLetters["4"][4]?.value}
-                </div>
-              </div>
-              <div className="board-row">
-                <div className={cellClassName(5, 0)}>
-                  {inputLetters["5"][0]?.value}
-                </div>
-                <div className={cellClassName(5, 1)}>
-                  {inputLetters["5"][1]?.value}
-                </div>
-                <div className={cellClassName(5, 2)}>
-                  {inputLetters["5"][2]?.value}
-                </div>
-                <div className={cellClassName(5, 3)}>
-                  {inputLetters["5"][3]?.value}
-                </div>
-                <div className={cellClassName(5, 4)}>
-                  {inputLetters["5"][4]?.value}
-                </div>
-              </div>
-              <div className="board-row">
-                <div className={cellClassName(6, 0)}>
-                  {inputLetters["6"][0]?.value}
-                </div>
-                <div className={cellClassName(6, 1)}>
-                  {inputLetters["6"][1]?.value}
-                </div>
-                <div className={cellClassName(6, 2)}>
-                  {inputLetters["6"][2]?.value}
-                </div>
-                <div className={cellClassName(6, 3)}>
-                  {inputLetters["6"][3]?.value}
-                </div>
-                <div className={cellClassName(6, 4)}>
-                  {inputLetters["6"][4]?.value}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="Keyboard-module">
-            <div id="keyboard-cont">
-              <div className="first-row">
-                <button
-                  className={keyboardClassName("Q")}
-                  value="Q"
-                  id="Q"
-                  onClick={onClickAlphabet}
-                >
-                  q
-                </button>
-                <button
-                  className={keyboardClassName("W")}
-                  value="W"
-                  id="W"
-                  onClick={onClickAlphabet}
-                >
-                  w
-                </button>
-                <button
-                  className={keyboardClassName("E")}
-                  value="E"
-                  id="E"
-                  onClick={onClickAlphabet}
-                >
-                  e
-                </button>
-                <button
-                  className={keyboardClassName("R")}
-                  value="R"
-                  id="R"
-                  onClick={onClickAlphabet}
-                >
-                  r
-                </button>
-                <button
-                  className={keyboardClassName("T")}
-                  value="T"
-                  id="T"
-                  onClick={onClickAlphabet}
-                >
-                  t
-                </button>
-                <button
-                  className={keyboardClassName("Y")}
-                  value="Y"
-                  id="Y"
-                  onClick={onClickAlphabet}
-                >
-                  y
-                </button>
-                <button
-                  className={keyboardClassName("U")}
-                  value="U"
-                  id="U"
-                  onClick={onClickAlphabet}
-                >
-                  u
-                </button>
-                <button
-                  className={keyboardClassName("I")}
-                  value="I"
-                  id="I"
-                  onClick={onClickAlphabet}
-                >
-                  i
-                </button>
-                <button
-                  className={keyboardClassName("O")}
-                  value="O"
-                  id="O"
-                  onClick={onClickAlphabet}
-                >
-                  o
-                </button>
-                <button
-                  className={keyboardClassName("P")}
-                  value="P"
-                  id="P"
-                  onClick={onClickAlphabet}
-                >
-                  p
-                </button>
-              </div>
-              <div className="second-row">
-                <div className="flex-div"></div>
-                <button
-                  className={keyboardClassName("A")}
-                  value="A"
-                  id="A"
-                  onClick={onClickAlphabet}
-                >
-                  a
-                </button>
-                <button
-                  className={keyboardClassName("S")}
-                  value="S"
-                  id="S"
-                  onClick={onClickAlphabet}
-                >
-                  s
-                </button>
-                <button
-                  className={keyboardClassName("D")}
-                  value="D"
-                  id="D"
-                  onClick={onClickAlphabet}
-                >
-                  d
-                </button>
-                <button
-                  className={keyboardClassName("F")}
-                  value="F"
-                  id="F"
-                  onClick={onClickAlphabet}
-                >
-                  f
-                </button>
-                <button
-                  className={keyboardClassName("G")}
-                  value="G"
-                  id="G"
-                  onClick={onClickAlphabet}
-                >
-                  g
-                </button>
-                <button
-                  className={keyboardClassName("H")}
-                  value="H"
-                  id="H"
-                  onClick={onClickAlphabet}
-                >
-                  h
-                </button>
-                <button
-                  className={keyboardClassName("J")}
-                  value="J"
-                  id="J"
-                  onClick={onClickAlphabet}
-                >
-                  j
-                </button>
-                <button
-                  className={keyboardClassName("K")}
-                  value="K"
-                  id="K"
-                  onClick={onClickAlphabet}
-                >
-                  k
-                </button>
-                <button
-                  className={keyboardClassName("L")}
-                  value="L"
-                  id="L"
-                  onClick={onClickAlphabet}
-                >
-                  l
-                </button>
-                <div className="flex-div"></div>
-              </div>
-              <div className="third-row">
-                <button
-                  className="keyboard-button"
-                  value="Enter"
-                  onClick={onClickEnter}
-                >
-                  <AiOutlineEnter />
-                </button>
-                <button
-                  className={keyboardClassName("Z")}
-                  value="Z"
-                  id="Z"
-                  onClick={onClickAlphabet}
-                >
-                  z
-                </button>
-                <button
-                  className={keyboardClassName("X")}
-                  value="X"
-                  id="X"
-                  onClick={onClickAlphabet}
-                >
-                  x
-                </button>
-                <button
-                  className={keyboardClassName("C")}
-                  value="C"
-                  id="C"
-                  onClick={onClickAlphabet}
-                >
-                  c
-                </button>
-                <button
-                  className={keyboardClassName("V")}
-                  value="V"
-                  id="V"
-                  onClick={onClickAlphabet}
-                >
-                  v
-                </button>
-                <button
-                  className={keyboardClassName("B")}
-                  value="B"
-                  id="B"
-                  onClick={onClickAlphabet}
-                >
-                  b
-                </button>
-                <button
-                  className={keyboardClassName("N")}
-                  value="N"
-                  id="N"
-                  onClick={onClickAlphabet}
-                >
-                  n
-                </button>
-                <button
-                  className={keyboardClassName("M")}
-                  value="M"
-                  id="M"
-                  onClick={onClickAlphabet}
-                >
-                  m
-                </button>
-                <button
-                  className="keyboard-button"
-                  value="Del"
-                  onClick={onClickBackspace}
-                >
-                  <BsBackspace />
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
+        <button
+          type="button"
+          onClick={handleStartGame}
+          className="w-25 btn btn-primary start-game-btn"
+        >
+          Start Game
+        </button>
       )}
     </div>
   );
